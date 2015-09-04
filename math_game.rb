@@ -11,8 +11,6 @@ require 'colorize'
   :name => "Player2"
 }
 
-@current_player
-
 def initialize_players
 
   puts "What is player 1's name?"

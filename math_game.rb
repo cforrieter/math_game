@@ -1,5 +1,4 @@
 require 'colorize'
-require 'pry'
 
 @player1 = {
   :wins => 0,
@@ -26,25 +25,25 @@ end
 def initialize_game
   @player1[:lives] = 3
   @player2[:lives] = 3
-
-  @current_player = @player1
-
-  game_status
+  player = @player1
+  game_status(player)
+  
+  return player
 end
 
 def win_status
   "\n\n#{@player1[:name]} has won #{@player1[:wins]} times!\n#{@player2[:name]} has won #{@player2[:wins]} times!"
 end
 
-def game_status
+def game_status(player)
   game_over = false
   message = ''
-  unless @player1[:lives] === 0 || @player2[:lives] === 0
+  unless player[:lives] === 0
     message = "The current game status is: \n\t#{@player1[:name]}: #{@player1[:lives]}\n\t#{@player2[:name]}: #{@player2[:lives]}"
   else
     game_over = true
     message << "The game is over!\n"
-    if @player1[:lives] > @player2[:lives]
+    if player != @player1
       message << "#{@player1[:name]} wins with #{@player1[:lives]} live(s) remaining."
       @player1[:wins] += 1 
     else
@@ -57,19 +56,15 @@ def game_status
   return game_over
 end
 
-def lose_life
-  if @current_player === @player1[:name]
-    @player1[:lives] -= 1
-  else
-    @player2[:lives] -= 1
-  end
+def lose_life(player)
+  player[:lives] -= 1
 end
 
-def swap_players
-  if @current_player === @player1[:name]
-    @current_player = @player2
+def swap_players(player)
+  if player === @player1
+    player = @player2
   else
-    @current_player = @player1
+    player = @player1
   end
 end
 
@@ -99,27 +94,30 @@ def generate_question
   return [question, answer]
 end
 
-def prompt_player(question)
-  puts "#{@current_player[:name]}, #{question}"
+def prompt_player(player, question)
+  puts "#{player[:name]}, #{question}"
   print "You answer: "
   return gets.chomp.to_i
 end
 
-def verify_answer(answer, player_answer)
+def verify_answer(player, answer, player_answer)
   if answer == player_answer
     puts "Correct!".colorize(:green)
+    return true
   else
     puts "Wrong! The answer was #{answer}.".colorize(:red)
-    lose_life
-    return game_status
+    return false
   end
 end
 
-def turn
+def turn(player)
+  game_over = false
   question, answer = generate_question
-  player_answer = prompt_player(question)
-  game_over = verify_answer(answer, player_answer)
-  swap_players
+  player_answer = prompt_player(player, question)
+  unless verify_answer(player, answer, player_answer)
+    lose_life(player)
+    game_over = game_status(player)
+  end
   return game_over
 end
 
@@ -129,9 +127,10 @@ def game
 
   until finished
     game_over = false
-    initialize_game
+    player = initialize_game
     until game_over
-      game_over = turn
+      game_over = turn(player)
+      player = swap_players(player)
     end
     puts "Play again? (y/n)"
     play_again = gets.chomp.downcase

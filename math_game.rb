@@ -1,48 +1,55 @@
 require 'colorize'
+require 'pry'
 
-@player1_life
-@player2_life
-@player1_name
-@player2_name
+@player1 = {
+  :wins => 0,
+  :lives => 3,
+  :name => "Player1"
+}
+@player2 = {
+  :wins => 0,
+  :lives => 3,
+  :name => "Player2"
+}
+
 @current_player
-@player1_wins = 0
-@player2_wins = 0
 
 def initialize_players
+
   puts "What is player 1's name?"
-  @player1_name = gets.chomp.capitalize
+  @player1[:name] = gets.chomp.capitalize
 
   puts "What is player 2's name?"
-  @player2_name = gets.chomp.capitalize
+  @player2[:name] = gets.chomp.capitalize
 end
 
 def initialize_game
-  @player1_life = 3
-  @player2_life = 3
+  @player1[:lives] = 3
+  @player2[:lives] = 3
 
-  @current_player = @player1_name
+  @current_player = @player1
 
   game_status
 end
 
 def win_status
-  "\n\n#{@player1_name} has won #{@player1_wins} times!\n#{@player2_name} has won #{@player2_wins} times!"
+  "\n\n#{@player1[:name]} has won #{@player1[:wins]} times!\n#{@player2[:name]} has won #{@player2[:wins]} times!"
 end
 
 def game_status
   game_over = false
   message = ''
-  unless @player1_life === 0 || @player2_life === 0
-    message = "The current game status is: \n\t#{@player1_name}: #{@player1_life}\n\t#{@player2_name}: #{@player2_life}"
+  unless @player1[:lives] === 0 || @player2[:lives] === 0
+    message = "The current game status is: \n\t#{@player1[:name]}: #{@player1[:lives]}\n\t#{@player2[:name]}: #{@player2[:lives]}"
   else
     game_over = true
     message << "The game is over!\n"
-    if @player1_life > @player2_life
-      message << "#{@player1_name} wins with #{@player1_life} live(s) remaining."
-      @player1_wins += 1 
+    if @player1[:lives] > @player2[:lives]
+      message << "#{@player1[:name]} wins with #{@player1[:lives]} live(s) remaining."
+      @player1[:wins] += 1 
     else
-      message << "#{@player2_name} wins with #{@player2_life} live(s) remaining."
-      @player2_wins += 1 
+      message << "#{@player2[:name]} wins with #{@player2[:lives]} live(s) remaining."
+      @player2[:wins] += 1 
     end
     message << win_status
   end
@@ -51,18 +58,18 @@ def game_status
 end
 
 def lose_life
-  if @current_player === @player1_name
-    @player1_life -= 1
+  if @current_player === @player1[:name]
+    @player1[:lives] -= 1
   else
-    @player2_life -= 1
+    @player2[:lives] -= 1
   end
 end
 
 def swap_players
-  if @current_player === @player1_name
-    @current_player = @player2_name
+  if @current_player === @player1[:name]
+    @current_player = @player2
   else
-    @current_player = @player1_name
+    @current_player = @player1
   end
 end
 
@@ -93,7 +100,7 @@ def generate_question
 end
 
 def prompt_player(question)
-  puts "#{@current_player}, #{question}"
+  puts "#{@current_player[:name]}, #{question}"
   print "You answer: "
   return gets.chomp.to_i
 end

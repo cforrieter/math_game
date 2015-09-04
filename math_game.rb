@@ -111,9 +111,9 @@ end
 def turn
   question, answer = generate_question
   player_answer = prompt_player(question)
-  game_state = verify_answer(answer, player_answer)
+  game_over = verify_answer(answer, player_answer)
   swap_players
-  return game_state
+  return game_over
 end
 
 def game

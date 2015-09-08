@@ -20,13 +20,38 @@ end
 
 class Game
 
+  class InvalidGuessError < StandardError; end
+  class InvalidNameError < StandardError; end
+
   def self.initialize_players
-    puts "What is player 1's name?"
-    name1 = gets.chomp.capitalize
-
-    puts "What is player 2's name?"
-    name2 = gets.chomp.capitalize
-
+    name1 = nil
+    name2 = nil
+    loop do
+      begin
+        puts "What is player 1's name?"
+        name1 = gets.chomp.capitalize
+        if name1.empty?
+          raise InvalidNameError, "Please enter a name!"
+        else
+          break
+        end
+      rescue InvalidNameError => e
+        puts e.message
+      end
+    end
+    loop do
+      begin
+        puts "What is player 2's name?"
+        name2 = gets.chomp.capitalize
+        if name2.empty?
+          raise InvalidNameError, "Please enter a name!"
+        else
+          break
+        end
+      rescue InvalidNameError => e
+        puts e.message
+      end
+    end
     return Game.new(name1, name2)
   end
   
@@ -105,10 +130,21 @@ class Game
     return [question, answer]
   end
 
-  def prompt_player(player, question)
-    puts "#{player.name}, #{question}"
-    print "You answer: "
-    return gets.chomp.to_i
+  def prompt_player(player, question)   
+    loop do
+      begin
+        puts "#{player.name}, #{question}"
+        print "You answer: "
+        answer = gets.chomp.strip
+        unless /\b[0-9]+\.?[0-9]*\b/.match(answer)
+          raise InvalidGuessError, "Please enter a number!"
+        else
+          return answer.to_i
+        end
+      rescue InvalidGuessError => e
+        puts e.message
+      end
+    end
   end
 
   def verify_answer(player, answer, player_answer)
